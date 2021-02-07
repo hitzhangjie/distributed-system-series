@@ -203,6 +203,10 @@
 
 #### 2.1.2 [Up and down the level of abstraction](http://book.mixu.net/distsys/abstractions.html)
 
+##### 2.1.2.1 The FLP impossibility result
+
+    > a **deterministic** consensus protocol cannot have **liveness**, **safety** and **fault tolerance** in a fully asynchronous system.
+
 #### 2.1.3 [Time and order](http://book.mixu.net/distsys/time.html)
 
 #### 2.1.4 [Replication: preventing divergence](http://book.mixu.net/distsys/replication.html)
