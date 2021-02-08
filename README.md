@@ -196,9 +196,74 @@
 
 #### 2.1.2 [Up and down the level of abstraction](http://book.mixu.net/distsys/abstractions.html)
 
-##### 2.1.2.1 The FLP impossibility result
+我们先在不同抽象层次上观察，来看一些“**不可能的结果**”（impossibility results，如CAP和FLP），然后再把注意力转向更具体的层次来关注下“性能”。
+
+经常编程的话，应该熟悉“抽象层次”的提法。开发人员通常工作在某个抽象层次上，并且通过API调用与更下层进行交互，并且当前抽象层次也需要提供API给更上层的应用调用或者与用户交互。七层OSI网络模型便是一个很好的例子。
+
+分布式编程很大程度上是在处理“分布"的问题。我们的系统中有很多的节点，但我们希望它能像一个单机系统一样工作，这两者之间是存在矛盾的。意味着，我们需要找到一个好的抽象，以在系统的可能性、可理解性和性能之间达到一个平衡。
+
+抽象层次中，当我们说X比Y更抽象时，是什么意思呢？首先，X不会引入任何新的或与Y根本不同的东西。实际上，X可能会删除Y才有的某些东西或从更易于管理的角度出发来进行一般化设计。其次，X移走的某些Y的东西对于手头的事情并不重要，X比Y更容易掌握。抽象，更简单的问题描述，褪去了各种无关的具体细节、又保留了本质，更容易被分析，提出的解决方案也更具有普适性。
+
+实际上，如果我们能够保留一些问题的本质，那么结果、派生结果也会具有相对广泛的应用。这就是不可能结果问题（impossiblility results）非常重要的原因：它们对问题进行了简化，基本上是用最简单的问题形式，来揭示即便是施加了一些约束、限制、假设后，我们仍然不可能解决该问题。从而针对该问题的更一般化的问题，可以得出我们更无法解决的结论。
+
+所有的抽象都忽略了一些东西，抽象的诀窍就是扔掉所有不必要的东西。你怎么知道什么是最重要的呢？嗯，你可能不会事先知道。
+
+每次我们从系统规范中排除系统的某些方面时，都会冒引入错误和性能问题的风险。这就是为什么有时我们需要朝另一个方向前进，并有选择地引入真实硬件和真实世界问题的某些方面。重新引入某些特定的硬件特性（例如，物理顺序）或其他物理特性，可能足以使系统运行良好。
+
+对于分布式系统时，抽象设计时，需要保留的最少现实信息的度如何把握呢？系统模型（system model），是这方面的一个重要规范。指定了一个系统模型之后，我们可以进一步看看相关的不可能结果和面临的挑战。
+
+##### 2.1.2.1 System Model（系统模型）
+
+> a set of assumptions about the environment and facilities on which a distributed system is implemented.
+
+TODO
+
+##### 2.1.2.2 系统模型中的节点
+
+TODO
+
+##### 2.1.2.3 系统模型中的通信链路
+
+TODO
+
+##### 2.1.2.4 时间/顺序假设
+
+分布式系统中节点的不同物理分布带来的一个问题是，每个节点对这个世界的“感受”都是不同的。如果节点彼此之间的距离不同，则从一个节点发送到另一个节点的信息将在不同的时间到达，并且可能以不同的顺序到达其他节点。
+
+时间假设在不同的系统模型里面也是不同的，我们主要关注的两个模型：
+
+- 同步系统模型（synchronous system model）
+
+    > Processes execute in lock-step; there is a known upper bound on message transmission delay; each process has an accurate clock.
+
+    同步系统模型对时间和顺序施加了许多约束。它基本上假设节点具有相同的体验：发送的消息始终能在最大传输延迟内被接收，并且过程以lockstep方式执行。这很方便，因为它使您可以对时间和顺序进行假设，而异步系统模型则不能。
+
+- 异步系统模型（asynchronous system model）
+
+    > No timing assumptions - e.g. processes execute at independent rates; there is no bound on message transmission delay; useful clocks do not exist.
+
+    异步模型中，您不能依赖定时（或“时间传感器”）。
+
+    解决同步系统模型中的问题更容易，因为相关的假设（如执行速度、最大消息传输延迟和时钟准确性）都有助于解决问题，因为您可以基于这些假设进行推断来排除一些故障。
+
+    当然，同步系统模型在现实中并非总是成立。 现实世界的网络容易出现故障，并且对消息延迟没有严格的限制。现实世界的系统充其量只能是部分同步模型：它们有时可能会正常工作并提供一些上限，但是有时消息会无限期地延迟并且时钟不同步。我不会在这里讨论同步系统的算法，但是您可能会在许多其他入门书中碰到它们，因为它们在分析上比较容易。
+
+##### 2.1.3 共识问题（Consensus Problem）
+
+    TODO
+
+#### 2.1.3.1 Two impossibility results
+
+#### 2.1.3.2 The FLP impossibility result
+
+#### 2.1.3.3 The CAP 
 
     > a **deterministic** consensus protocol cannot have **liveness**, **safety** and **fault tolerance** in a fully asynchronous system.
+
+参考文献：
+
+- [lockstep (computing)](https://en.wikipedia.org/wiki/Lockstep_(computing))
+- [A Brief Tour of FLP Impossibility.pdf](https://www.the-paper-trail.org/post/2008-08-13-a-brief-tour-of-flp-impossibility)
 
 #### 2.1.3 [Time and order](http://book.mixu.net/distsys/time.html)
 
