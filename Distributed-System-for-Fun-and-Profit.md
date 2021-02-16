@@ -337,7 +337,15 @@ FLP不可能结果，在分布式相关的学术研究中FLP不可能及其证�
 
 **FLP不可能结果很重要，因为它强调了对异步系统模型不得不做这样一个折衷：当消息传递没有保证时，解决共识问题的算法必须放弃安全性（safety）或者放弃活性（liveness）**。
 
-TODO what's the meaning of safety, liveness?
+那么，如何理解safety和liveness呢？
+
+首先，一个并发程序的执行过程可以看做是一个无穷的状态序列，下面是safety和liveness的非正式定义：
+
+- safety：safety属性指的是，一些'bad thing'在程序执行期间不发生。safety属性相关的示例有互斥、消除死锁、部分成功、先来先服务；
+- liveness：liveness属性指的是，一些'good thing'在程序执行期间能发生。liveness属性相关的示例包括避免饿死、算法正常终止、确保服务；
+
+其他的属性，其实可以说是safety（避免bad thing发生）、liveness（让good thing发生）的一些取交操作衍生而来。
+
 
 FLP不可能问题，或者说结论，与算法设计人员特别相关，因为它对异步模型中我们可以解决的问题添加了严格的约束。
 
@@ -346,6 +354,8 @@ ps：消息传递在异步系统中，几乎总是不可能保证的，所以解
 参考资料：
 - [A Brief Tour of FLP Impossibility.pdf](https://www.the-paper-trail.org/post/2008-08-13-a-brief-tour-of-flp-impossibility)
 - [Impossibility of distributed consensus with one faulty process](http://scholar.google.com/scholar?q=Impossibility+of+distributed+consensus+with+one+faulty+process) - Fischer, Lynch and Patterson, 1985
+- [Defining liveness](https://www.sciencedirect.com/science/article/abs/pii/0020019085900560?via%3Dihub) - Bowen Alpern, Fred B. Schneider
+
 
 ### 2.6.2 The CAP Theroem
 
@@ -461,8 +471,6 @@ CAP中的“C”指的是“强一致性”，但是“consistency”并不是�
 ### 2.7.4 最终一致性模型
 
 最终一致性模型，意思是说，如果我们停止更新某个值，过一段时间t之后，所有的副本将达成一致更新成相同的值。暗示，在这个时间t到达之前，各个副本中的数据会出现不一致，而且不一致的方式是不确定的。由于它是微不足道的（仅活泼性），因此没有补充信息就没有用。
-
-TODO what's the meaning of safety, liveness?
 
 说某件事最终最终是一致的，就像说“人们最终死了”。 这是一个非常弱的约束，我们可能希望至少对两件事进行更具体的描述：
 
