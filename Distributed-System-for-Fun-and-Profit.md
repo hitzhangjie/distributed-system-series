@@ -740,6 +740,8 @@ TODO what's the meaning of CALM therom?
 
 # 4 [Replication: preventing divergence](http://book.mixu.net/distsys/replication.html)
 
+复制问题是分布式系统经常要讨论的问题之一，相比leader选举、失败检测、互斥、共识、全局快照问题，我更倾向于介绍复制相关的内容，因为相对来说，复制技术也是大多数人更感兴趣的部分。例如，区分并行数据库的一种方式就是它们采用的复制能力的差异。而且，复制还带为其他一些子问题提供了上下文，如leader选举、失败检测、共识和原子广播。
+
 # 5 [Replication: accepting divergence](http://book.mixu.net/distsys/eventual.html)
 
 # 6 [Appendix](http://book.mixu.net/distsys/appendix.html)
