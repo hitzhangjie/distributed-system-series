@@ -129,7 +129,7 @@
 - 系统中节点的数量增加，也增加了节点之间的通信开销（节点要与其他节点通信，通信请求数量多了），随着集群规模扩大，通信引入的开销会降低节点的计算性能；
 - 系统中节点的数量增加，如果节点间地理位置增大了，节点间最小通信时延会增加，会增加系统处理或特定操作的响应时间；
 
-    ![cluster size (number of cores)](http://book.mixu.net/distsys/images/barroso_holzle.png)
+    ![cluster size (number of cores)](images/barroso_holzle.png)
 
 分布式系统设计，需要先确定设计目标，设计实现时需要为了设计目标来做各种现实的权衡、折中。通常这里的设计目标，需要以各种保证条款的形式沉淀下来，如SLA（Service Level Agreement）。如，如果一次数据写操作成功，隔多久可以从其他地方访问最新数据？或者数据写入之后，数据持久性能保持多久？或者针对一次计算，隔多久可以计算完成返回结果？再或者说，如果一个组件失败，或者某个操作出问题，对系统会造成多大范围的影响、事故？
 
@@ -193,7 +193,7 @@
 
 下图中展示了分区、复制二者之间的一个区别，图中数据集A和B是以分区的形式存储到了不同节点Node1和Node2上，数据集C则是以复制的方式在Node1、Node2上进行了存储。
 
-![parition and replicated](http://book.mixu.net/distsys/images/part-repl.png)
+![parition and replicated](images/part-repl.png)
 
 不同的分布式系统可能会选择不同的数据存储策略，可能是分区，也可能是复制，更常见的是两者的集合，数据集会分区存储到不同节点，同时也会在其他节点生成数据的副本。现在需要了解的是，分区、复制这两种方式，它们各有优缺点，分区、复制也有不同的算法来支持，需要结合具体的设计目标来选择和评估。
 
@@ -275,7 +275,7 @@
 
 如果系统中出现了网络失败，就可能会形成网络分区，分区中的节点还是可以保持工作，只是不同分区中的节点不能相互通信了。当网络故障后出现分区时，分区之间的消息传递可能会出现丢失、延迟，直到网络分区被修复。不同分区中的节点仍然可以被某些clients访问，分区中的节点也可以提供服务，这与节点crash后无法提供服务是两种明显不同的情况，必须要对这两种情况进行区分对待。下图显示了节点失败和网络分区的故障发生点的不同，前者是节点，后者是网络：
 
-![node failure vs. network partition](http://book.mixu.net/distsys/images/system-of-2.png)
+![node failure vs. network partition](images/system-of-2.png)
 
 很少会对通信链路做一些假设，我们可以假设通信链路是单向传输的，或者我们可以引入对不同通信链路的通信开销的考量（如不同物理距离的通信时延）。但是，在真实的商业系统中需要做这种假设的情况比较少，除非涉及到较远距离的通信（如广域网WAN通信），所以这里也不会做过多假设。成本和拓扑的更详细模型可以以复杂性为代价进行更好的优化。
 
@@ -339,11 +339,11 @@ Validity：如果所有正确的进程都提出了相同的值V，那么所有�
 
 ### 2.6.1 The FLP impossibility result
 
-FLP不可能结果，在分布式相关的学术研究中FLP不可能及其证明具有非常重要的地位，感兴趣的可以参考 /materials/A Brief Tour of FLP Impossibility.pdf，本文这里只对FLP不可能结果进行概述。FLP不可能结果是以3名研究人员姓名命名的（分别是Fischer、Lynch和Patterson）。FLP不可能结果，研究了异步模型下的共识问题（技术上是agreement问题，是共识问题的一种非常弱的形式）。FLP不可能结果证明论文中，做了这样的假设：假定节点只能因崩溃而失败；假定网络是可靠的，并且异步系统模型的典型时序假设成立，即对消息延迟没有任何的约束、限制。
+FLP不可能结果，在分布式相关的学术研究中FLP不可能及其证明具有非常重要的地位，感兴趣的可以参考 /papers/A Brief Tour of FLP Impossibility.pdf，本文这里只对FLP不可能结果进行概述。FLP不可能结果是以3名研究人员姓名命名的（分别是Fischer、Lynch和Patterson）。FLP不可能结果，研究了异步模型下的共识问题（技术上是agreement问题，是共识问题的一种非常弱的形式）。FLP不可能结果证明论文中，做了这样的假设：假定节点只能因崩溃而失败；假定网络是可靠的，并且异步系统模型的典型时序假设成立，即对消息延迟没有任何的约束、限制。
 
 在这些假设下，FLP不可能结果表明：“在一个遭受故障的异步系统中，不存在一个确定性的算法能够用来解决共识问题，即使系统中永远不丢失消息、最多一个进程失败（且因为崩溃失败，崩溃就是停止执行）”。
 
-这个结果意味着，即使在一个非常小的系统模型中，不可能以一种永远没有延迟的方式解决共识问题。论据是，如果存在这样的算法，则可以设计该算法的执行，其中该算法将通过延迟消息传递而在任意时刻保持不确定状态（“二价”，bivalent），这在异步系统模型中是允许的。这与假设冲突，因此这种算法不存在。详细的FLP不可能结果证明，可以参考 /materials/A Brief Tour FLP Impossibility.pdf。
+这个结果意味着，即使在一个非常小的系统模型中，不可能以一种永远没有延迟的方式解决共识问题。论据是，如果存在这样的算法，则可以设计该算法的执行，其中该算法将通过延迟消息传递而在任意时刻保持不确定状态（“二价”，bivalent），这在异步系统模型中是允许的。这与假设冲突，因此这种算法不存在。详细的FLP不可能结果证明，可以参考 /papers/A Brief Tour FLP Impossibility.pdf。
 
 **FLP不可能结果很重要，因为它强调了对异步系统模型不得不做这样一个折衷：当消息传递没有保证时，解决共识问题的算法必须放弃安全性（safety）或者放弃活性（liveness）**。
 
@@ -381,7 +381,7 @@ CAP定理最初是由计算机科学家Eric Brewer提出的一个猜想。 在�
 
 CAP理论表明，我们同时只能满足两个条件。我们甚至可以将其绘制成漂亮的图，从三个属性中选择两个属性，可以得到对应于不同交集的三种类型的系统：
 
-![CAP三选二可得到的3种系统](http://book.mixu.net/distsys/images/CAP.png)
+![CAP三选二可得到的3种系统](images/CAP.png)
 
 请注意，该定理指出中间区域对应的系统（具有所有三个属性）是无法实现的。 然后我们得到三种不同的系统类型：
 
@@ -398,7 +398,7 @@ CA和CP系统设计均提供相同的一致性模型：高度一致性。 唯一
 
 假设发生分区，则该定理简化为可用性和一致性之间的二元选择。
 
-![CAP如果分区必然发生](http://book.mixu.net/distsys/images/CAP_choice.png)
+![CAP如果分区必然发生](images/CAP_choice.png)
 
 我认为应该从CAP定理中得出四个结论：
 
@@ -563,7 +563,7 @@ git仓库的不同分支上的提交记录，就是部分有序的。比如从ma
 
 全局时钟假设，指的是假设存在一个完美精度的全局时钟，并且每个人都可以使用该时钟。这就是我们人类更倾向于思考时间的方式，因为在人与人之间的互动中，时间的微小差异影响不大。
 
-![global clock](http://book.mixu.net/distsys/images/global-clock.png)
+![global clock](images/global-clock.png)
 
 全局时钟基本上是全局顺序的源头，所有节点上每个操作的确切顺序，这些节点之间并不需要通信来同步时间。
 
@@ -577,7 +577,7 @@ git仓库的不同分支上的提交记录，就是部分有序的。比如从ma
 
 第二个，也许更合理的假设是，每台机器都有自己的时钟，但是没有全局时钟。这意味着您不能使用本地时钟来确定远程时间戳是在本地时间戳之前还是之后发生的；换句话说，您无法比较两台不同计算机上的时间戳，即使您这么比较了，也不能说明什么。
 
-![local clock](http://book.mixu.net/distsys/images/local-clock.png)
+![local clock](images/local-clock.png)
 
 本地时钟假设与现实世界更加接近。它能指定了局部顺序：每个系统上的事件都是有序的，但是不能仅通过时钟在整个系统上对事件进行全局排序。
 
@@ -661,7 +661,7 @@ Lamport时钟维护的计数器，允许跨分布式系统中的节点进行比�
 
 下图展示了一个向量时钟的示意图：
 
-![vector clock](http://book.mixu.net/distsys/images/vector_clock.svg.png)
+![vector clock](images/vector_clock.svg.png)
 
 三个节点(A,B,C)中的每个节点都跟踪向量时钟。当事件发生时，会用向量时钟的当前值为事件打上一个时间戳。通过检查{A:2，B:4，C:1}这样的向量时钟，我们可以准确地识别（可能）影响该事件的消息。
 
@@ -696,7 +696,7 @@ Chandra等（1996年）在讨论如何解决共识问题时有讨论到了故障
 
 Chandra等表明即使是非常弱的故障检测器 — 最终的弱故障检测器⋄W（最终精度较弱+完整性较弱）也可以用来解决共识问题。 下图（来自本文）说明了系统模型与问题可解决性之间的关系：
 
-![problem solvability in different distributed computing models](http://book.mixu.net/distsys/images/chandra_failure_detectors.png)
+![problem solvability in different distributed computing models](images/chandra_failure_detectors.png)
 
 TODO take time to understand this diagram!
 
