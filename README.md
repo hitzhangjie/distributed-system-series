@@ -25,3 +25,7 @@
 - [The fallacies of distributed computing](http://en.wikipedia.org/wiki/Fallacies_of_Distributed_Computing)
 
 该项目将从该系列文章入手，层层铺展开来，全面深入地学习分布式系统的方方面面。Let's Go!
+
+# 分布式系统学习笔记
+
+- 译文：[Distributed Systems for Fun and Profit](Distributed-System-for-Fun-and-Profit.md)
