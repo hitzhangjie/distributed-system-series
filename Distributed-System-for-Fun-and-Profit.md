@@ -738,6 +738,21 @@ TODO what's the meaning of CALM therom?
 
 在接下来的两章中，我们将研究强一致系统中的用于解决容错问题的复制技术（replication），同时对故障的恢复能力越来越强。这些系统为第一种情况提供了解决方案：当您需要保证正确性并愿意为此付出代价时。然后，我们将讨论弱一致性保证的系统，这些系统在面对分区时仍然可以使用，但是只能给您“尽力而为（best effort）”的结果。
 
+推荐阅读材料：
+
+- Lamport clocks, vector clocks
+  - Time, Clocks and Ordering of Events in a Distributed System - Leslie Lamport, 1978
+- Failure detection
+  - Unreliable failure detectors and reliable distributed systems - Chandra and Toueg
+  - Latency- and Bandwidth-Minimizing Optimal Failure Detectors - So & Sirer, 2007
+  - The failure detector abstraction, Freiling, Guerraoui & Kuznetsov, 2011
+- Snapshots
+  - Consistent global states of distributed systems: Fundamental concepts and mechanisms, Ozalp Babaogly and Keith Marzullo, 1993
+  - Distributed snapshots: Determining global states of distributed systems, K. Mani Chandy and Leslie Lamport, 1985
+- Causality
+  - Detecting Causal Relationships in Distributed Computations: In Search of the Holy Grail - Schwarz & Mattern, 1994
+  - Understanding the Limitations of Causally and Totally Ordered Communication - Cheriton & Skeen, 1993
+
 # 4 [Replication: preventing divergence](http://book.mixu.net/distsys/replication.html)
 
 复制问题是分布式系统经常要讨论的问题之一，相比leader选举、失败检测、互斥、共识、全局快照问题，我更倾向于介绍复制相关的内容，因为相对来说，复制技术也是大多数人更感兴趣的部分。例如，区分并行数据库的一种方式就是它们采用的复制能力的差异。而且，复制还带为其他一些子问题提供了上下文，如leader选举、失败检测、共识和原子广播。
