@@ -824,6 +824,15 @@ TODO what's the meaning of CALM therom?
 
 ## 4.3 主要复制方法一览
 
+前面看了两种基本的复制方法：同步复制和异步复制，现在我们来看下主要的复制算法。
+
+对复制算法的分类有很多种，这里我们再介绍除同步、异步复制外的另一种分类方法：
+
+- 单副本系统（single copy system）：阻止数据发散（prevent divergence）的复制算法；
+- 多主系统（multi-master system）：复制中允许出现数据发散（risk divergence）的复制算法；
+
+
+
 ## 4.4 主备复制
 
 ## 4.5 两阶段提交
