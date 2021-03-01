@@ -831,7 +831,41 @@ TODO what's the meaning of CALM therom?
 - 单副本系统（single copy system）：阻止数据发散（prevent divergence）的复制算法；
 - 多主系统（multi-master system）：复制中允许出现数据发散（risk divergence）的复制算法；
 
+单副本系统，看起来就像是一个系统一样。特别是，当出现部分节点故障时，系统能够确保只有一个单独的副本活跃。而且，系统能够确保副本是一致的。这就是共识问题（consensus problem）。
 
+一些进程（或者机器、节点）如果能在某些value上协商达成一致，就称为达到了共识。
+
+关于共识问题的更正式描述：
+
+- Agreement: Every correct process must agree on the same value.
+- Integrity: Every correct process decides at most one value, and if it decides some value, then it must have been proposed by some process.
+- Termination: All processes eventually reach a decision.
+- Validity: If all correct processes propose the same value V, then all correct processes decide V.
+
+互斥（mutual exclusion）、leader选举、多播（multicast）、原子广播（atomic broadcast），这些都是共识问题的相关实例。维护单副本一致性（single-copy consistency）的复制系统（replicated system）需要以某种方式解决共识问题。
+
+维护单副本一致性的复制算法，包括：
+
+- 1n messages (asynchronous primary/backup)
+- 2n messages (synchronous primary/backup)
+- 4n messages (2-phase commit, Multi-Paxos)
+- 6n messages (3-phase commit, Paxos with repeated leader election)
+
+这些算法，能够容忍的故障类型是不同的。根据算法执行过程中需要交换的消息数量，可以简单地将这些算法分为上面几类，为什么这么分呢？其实想看一下每增加一次消息交换能够换得什么有价值的东西。
+
+下图取自Google Ryan Barret的分享，这里描述了上述这些复制算法的一些异同点：
+
+![google transact09](images/google-transact09.png)
+
+上图中列出的一致性（consistency）、时延（latency）、throughput（吞吐量）、数据丢失（data loss）和故障转移（failover）特性，可以让我们重新回顾其两种不同的复制模式：同步复制（发送响应之前需要等待完成同步）和异步模式（立即发送响应不用等待同步完成）。当复制过程中出现等待的时候，就会获得更差的性能，但却能获得更强的一致性。两阶段提交（2PC）和仲裁系统（quorum systems）的吞吐量的区别，当我们讲到分区（和时延）问题的时候，吞吐量的差异就很容易体会到了。
+
+在该图中，强制弱（最终）一致性的算法被归为一类（“gossip”）。 但是，我将更详细地讨论用于弱一致性的复制方法-gossip和（部分）仲裁系统。 “事务”这一行实际上更多地是指全局谓词评估，在一致性较弱的系统中不支持global predictive evaluation（尽管可以支持local predicate evaluation）。
+
+值得注意的是，执行弱一致性算法的系统具有较少的通用算法，并且可以选择性地应用更多技术。由于不执行单副本一致性的系统可以像由多个节点组成的分布式系统一样自由地行动，因此明显的需要修复的目标较少，而重点更多地在于为人们提供一种推理方法，使他们能够对自己拥有的系统特性进行推理。
+
+例如：
+
+- 
 
 ## 4.4 主备复制
 
