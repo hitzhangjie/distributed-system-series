@@ -1,0 +1,13 @@
+--2021-02-27 16:50:43--  https://www.cs.mcgill.ca/~kemme/papers/icdcs00.pdf
+Connecting to 127.0.0.1:49960... connected.
+Proxy request sent, awaiting response... 200 OK
+Length: 160554 (157K) [application/pdf]
+Saving to: ‘icdcs00.pdf’
+
+     0K .......... .......... .......... .......... .......... 31%  124K 1s
+    50K .......... .......... .......... .......... .......... 63% 2.45M 0s
+   100K .......... .......... .......... .......... .......... 95%  271K 0s
+   150K ......                                                100% 39.2M=0.6s
+
+2021-02-27 16:50:46 (258 KB/s) - ‘icdcs00.pdf’ saved [160554/160554]
+
