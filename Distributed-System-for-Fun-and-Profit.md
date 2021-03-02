@@ -1057,7 +1057,7 @@ epoch充当逻辑时钟，当过时的节点何时开始通信时，其他节点
 - 在崩溃，磁盘丢失或配置新节点后以安全有效的方式更新新副本的过程；
 - 快照和垃圾收集程序的数据过程，以确保在一段合理的时间后保证安全（例如，平衡存储要求和容错要求）；
 
-Google的[Paxos Made Live](http://labs.google.com/papers/paxos_made_live.html)论文详细介绍了其中一些挑战。
+Google的[Paxos Made Live](https://www.cs.utexas.edu/users/lorenzo/corsi/cs380d/papers/paper2-1.pdf)论文详细介绍了其中一些挑战。
 
 ## 4.7 耐受网络分区的一致性算法：Paxos、Raft、ZAB
 
