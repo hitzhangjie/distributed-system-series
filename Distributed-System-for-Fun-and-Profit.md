@@ -775,7 +775,7 @@ TODO what's the meaning of CALM therom?
   - Detecting Causal Relationships in Distributed Computations: In Search of the Holy Grail - Schwarz & Mattern, 1994
   - Understanding the Limitations of Causally and Totally Ordered Communication - Cheriton & Skeen, 1993
 
-# 4 [Replication: preventing divergence](http://book.mixu.net/distsys/replication.html)
+# 4 [复制技术: 强一致性(preventing divergence)](http://book.mixu.net/distsys/replication.html)
 
 复制问题是分布式系统经常要讨论的问题之一，相比leader选举、失败检测、互斥、共识、全局快照问题，我更倾向于介绍复制相关的内容，因为相对来说，复制技术也是大多数人更感兴趣的部分。例如，区分并行数据库的一种方式就是它们采用的复制能力的差异。而且，复制还带为其他一些子问题提供了上下文，如leader选举、失败检测、共识和原子广播。
 
@@ -1165,7 +1165,94 @@ Raft和ZAB的关键特点这里先忽略了，感兴趣的可以阅读相关论�
 - [A simple totally ordered broadcast protocol](http://labs.yahoo.com/publication/a-simple-totally-ordered-broadcast-protocol/) - Junqueira, Reed, 2008
 - [ZooKeeper Atomic Broadcast](http://labs.yahoo.com/publication/zab-high-performance-broadcast-for-primary-backup-systems/) - Reed, 2011
 
-# 5 [Replication: accepting divergence](http://book.mixu.net/distsys/eventual.html)
+# 5 [复制技术: 弱一致性允许副本差异(accepting divergence)](http://book.mixu.net/distsys/eventual.html)
 
+## 5.1 弱一致性
+
+前面我们看了一些实现伴随着故障增加能够实现单副本一致性（强一致性）的算法，现在我们转移下目光，一起来看下除单副本一致性的其他一致性算法。
+
+总的来说，要提出一个允许副本数据不一致的一致性协议，就不能只考虑一个维度的事情，比如应该考虑业务对数据一致性和对可用性的要求。通常允许副本数据差异的一致性算法，往往都是高可用的，关键就看业务场景下用户能否感觉到副本数据的存在（感受到了数据不一致），又是否能接受。
+
+为什么弱一致性系统没有变的那么流行呢（毕竟通常都是高可用的呢）？
+
+- 要实现强一致，就要保证操作的顺序，要保证这个顺序是付出一定的代价的。
+- 另外，有时确实需要追求更高的可用性，而允许一定的数据差异，只要能在一段时间后能够修复这里的数据不一致性就可以了。
+
+因此有些时候，并不需要追求一个类似单一系统的算法（单副本一致性的），或许，我们需要的是一个这样的系统，我们写代码时不需要引入过多的、过重的协调（coordination）类的工作，而是先返回一个可以用的值（usable value），当然这个值可能并非是精确的（precise value）。通过这种方式来允许分区、副本不一致而追求高可用性，事后再通过其他方法来解决这里的不一致性问题。
+
+**最终一致性（eventual consistency）**表达的就是这样的意思：节点之间允许一段时间内出现数据不一致，但是**一定时间**后数据**最终**将达成一致。
+
+ps: 这里的需要注意两个点，一个是“一定时间”，不同业务场景要求也不一样，比如支付类要求秒级或者分钟级，而信息流业务可能要求十几分钟或者半小时都有可能；再一个就是“最终”，它表示一定时间后，结果一定能达成一致。
+
+对于提供最终一致性的系统，通常有两种类型的设计：
+
+- 一定概率保证的最终一致性（Eventual consistency with probabilistic guarantees）
+
+这类系统能在一段时间后检测到写冲突，但是不能保证结果是否等同于最终的串行执行结果。换句话说，更新冲突将导致可能用一个旧的值覆写了一个新的值，在一个正常操作中或者分区出现时可能会有异常发生。
+
+近年来，最具影响力的提供单副本一致性的系统设计是Amazon的Dynamo，我将作为一个系统的示例进行讨论，该系统可以最终提供概率保证。
+
+- 很强保证的最终一致性（Eventual consistency with strong guarantees）
+
+这种类型的系统可确保结果收敛到一个等效值，该值等于某些正确的顺序执行。 换句话说，这样的系统不会产生任何异常结果。 无需任何协调，您就可以构建相同服务的副本，并且这些副本可以以任何模式进行通信并以任何顺序接收更新，并且只要它们都看到相同的信息，它们最终将就最终结果达成一致。
+
+CRDT（收敛的复制数据类型）是即使网络延迟，分区和消息重新排序也能保证收敛到相同值的数据类型。 它们证明是收敛的，但是可以实现为CRDT的数据类型是有限的。
+
+**CALM（一致性作为逻辑单调性）猜想是同一原理的另一种表达方式：它将逻辑单调性等同于收敛。** 如果我们可以得出结论，某些事物在逻辑上是单调的，那么在没有协调的情况下运行也是安全的。 
+
+## 5.2 协调不同的操作顺序
+
+
+## 5.3 Amazon's Dynamo
+
+## 5.4 一致性hash
+
+## 5.5 部分投票
+
+## 5.6 R+W>N？是否等同于强一致？
+
+No.
+
+## 5.7 冲突检测 & 读修复
+
+## 5.8 副本同步：gossip协议 与 Merkle树
+
+## 5.9 Dynamo实践：PBS（probabilistically bounded staleness）
+
+## 5.10 无序编程
+
+## 5.11 CRDTs：可收敛的复制数据类型（Convergent repliated data types）
+
+## 5.12 CALM定理
+
+## 5.13 什么是非单调性（non-mononicity）
+
+参考资料：
+
+**The CALM theorem, confluence analysis and Bloom**:
+
+[Joe Hellerstein's talk @RICON 2012](http://vimeo.com/53904989) is a good introduction to the topic, as is [Neil Conway's talk @Basho](http://vimeo.com/45111940). For Bloom in particular, see [Peter Alvaro's talk@Microsoft](http://channel9.msdn.com/Events/Lang-NEXT/Lang-NEXT-2012/Bloom-Disorderly-Programming-for-a-Distributed-World).
+
+- [The Declarative Imperative: Experiences and Conjectures in Distributed Logic](http://www.eecs.berkeley.edu/Pubs/TechRpts/2010/EECS-2010-90.pdf) - Hellerstein, 2010
+- [Consistency Analysis in Bloom: a CALM and Collected Approach](http://db.cs.berkeley.edu/papers/cidr11-bloom.pdf) - Alvaro et al., 2011
+- [Logic and Lattices for Distributed Programming](http://db.cs.berkeley.edu/papers/UCB-lattice-tr.pdf) - Conway et al., 2012
+- [Dedalus: Datalog in Time and Space](http://db.cs.berkeley.edu/papers/datalog2011-dedalus.pdf) - Alvaro et al., 2011
+
+**CRDTs**：
+
+[Marc Shapiro's talk @ Microsoft](http://research.microsoft.com/apps/video/dl.aspx?id=153540) is a good starting point for understanding CRDT's.
+
+- [CRDTs: Consistency Without Concurrency Control](http://hal.archives-ouvertes.fr/docs/00/39/79/81/PDF/RR-6956.pdf) - Letitia et al., 2009
+- [A comprehensive study of Convergent and Commutative Replicated Data Types](http://hal.inria.fr/docs/00/55/55/88/PDF/techreport.pdf), Shapiro et al., 2011
+- [An Optimized conflict-free Replicated Set](http://arxiv.org/pdf/1210.3368v1.pdf) - Bieniusa et al., 2012
+
+**Dynamo; PBS; optimistic replication**：
+
+- [Dynamo: Amazon’s Highly Available Key-value Store](http://www.allthingsdistributed.com/files/amazon-dynamo-sosp2007.pdf) - DeCandia et al., 2007
+- [PNUTS: Yahoo!'s Hosted Data Serving Platform](http://scholar.google.com/scholar?q=PNUTS:+Yahoo!%27s+Hosted+Data+Serving+Platform) - Cooper et al., 2008
+- [The Bayou Architecture: Support for Data Sharing among Mobile Users](http://scholar.google.com/scholar?q=The+Bayou+Architecture%3A+Support+for+Data+Sharing+among+Mobile+Users) - Demers et al. 1994
+- [Probabilistically Bound Staleness for Practical Partial Quorums](http://pbs.cs.berkeley.edu/pbs-vldb2012.pdf) - Bailis et al., 2012
+- [Eventual Consistency Today: Limitations, Extensions, and Beyond](https://queue.acm.org/detail.cfm?id=2462076) - Bailis & Ghodsi, 2013
+- [Optimistic replication](http://www.ysaito.com/survey.pdf) - Saito & Shapiro, 2005
 
 # 6 [Appendix](http://book.mixu.net/distsys/appendix.html)
