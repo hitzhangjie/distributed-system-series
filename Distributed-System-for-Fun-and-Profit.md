@@ -32,8 +32,30 @@
 		* [3.4.1 时钟向量（vector clocks, time for causal order）](#341-时钟向量（vector-clocks,-time-for-causal-order）)
 		* [3.4.2 失败检测（failure detectors，time for cutoff）](#342-失败检测（failure-detectors，time-for-cutoff）)
 		* [3.4.3 时间、顺序、性能（time，order and performance）](#343-时间、顺序、性能（time，order-and-performance）)
-* [4 [Replication: preventing divergence](http://book.mixu.net/distsys/replication.html)](#4-[replication:-preventing-divergence](http://bookmixunet/distsys/replicationhtml))
-* [5 [Replication: accepting divergence](http://book.mixu.net/distsys/eventual.html)](#5-[replication:-accepting-divergence](http://bookmixunet/distsys/eventualhtml))
+* [4 [复制技术: 强一致性(单副本一致性)](http://book.mixu.net/distsys/replication.html)](#4-[replication:-preventing-divergence](http://bookmixunet/distsys/replicationhtml))
+	* [4.1 同步复制](#41-同步复制)
+	* [4.2 异步复制](#42-异步复制)
+	* [4.3 主要复制方法一览](#43-主要复制方法一览)
+	* [4.4 主备复制](#44-主备复制)
+	* [4.5 两阶段提交](#45-两阶段提交)
+	* [4.6 耐受网络分区的一致性算法](#46-耐受网络分区的一致性算法)
+		* [4.6.1 网络分区是什么？](#461-网络分区是什么？)
+		* [4.6.2 网络分区应对策略](#462-网络分区应对策略)
+		* [4.6.3 角色（Roles）](#463-角色（roles）)
+		* [4.6.4 世代（Epochs）](#464-世代（epochs）)
+		* [4.6.5 leader选举（leader changes via duels）](#465-leader选举（leader-changes-via-duels）)
+		* [4.6.7 提议编号（numbered proposals within an epoch）](#467-提议编号（numbered-proposals-within-an-epoch）)
+		* [4.6.8 正常操作（normal operation）](#468-正常操作（normal-operation）)
+	* [4.7 容忍分区的一致性算法：Paxos、Raft、ZAB](#47-容忍分区的一致性算法：paxos、raft、zab)
+		* [4.7.1 Paxos](#471-paxos)
+		* [4.7.2 ZAB](#472-zab)
+		* [4.7.3 Raft](#473-raft)
+	* [4.8 遵循强一致的复制方法](#48-遵循强一致的复制方法)
+		* [4.8.1 主备复制](#481-主备复制)
+		* [4.8.2 两阶段提交](#482-两阶段提交)
+		* [4.8.3 Paxos](#483-paxos)
+		* [4.8.4 Raft & ZAB](#484-raft-&-zab)
+* [5 [复制技术: 弱一致性(允许数据差异)](http://book.mixu.net/distsys/eventual.html)](#5-[replication:-accepting-divergence](http://bookmixunet/distsys/eventualhtml))
 * [6 [Appendix](http://book.mixu.net/distsys/appendix.html)](#6-[appendix](http://bookmixunet/distsys/appendixhtml))
 
 
@@ -1144,5 +1166,6 @@ Raft和ZAB的关键特点这里先忽略了，感兴趣的可以阅读相关论�
 - [ZooKeeper Atomic Broadcast](http://labs.yahoo.com/publication/zab-high-performance-broadcast-for-primary-backup-systems/) - Reed, 2011
 
 # 5 [Replication: accepting divergence](http://book.mixu.net/distsys/eventual.html)
+
 
 # 6 [Appendix](http://book.mixu.net/distsys/appendix.html)
