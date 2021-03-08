@@ -1059,13 +1059,89 @@ epoch充当逻辑时钟，当过时的节点何时开始通信时，其他节点
 
 Google的[Paxos Made Live](https://www.cs.utexas.edu/users/lorenzo/corsi/cs380d/papers/paper2-1.pdf)论文详细介绍了其中一些挑战。
 
-## 4.7 耐受网络分区的一致性算法：Paxos、Raft、ZAB
+## 4.7 容忍分区的一致性算法：Paxos、Raft、ZAB
+
+这一节希望能解释一下容忍分区的一致性算法的大致工作原理。还是建议读者稍后能够去读一下Paxos、Raft、ZAB一致性协议中的论文来了解下详细过程以及它们的差异之处。
+
+ps: Raft论文侧重于更容易理解，它也拥有相比于Paxos的性能，ZAB协议是Paxos协议的变体。[papers](/papers/)目录下有我批注过的Raft一致性算法的论文。另外[braft](https://github.com/baidu/braft/tree/master/docs/cn)中也有提供对多种一致性算法的翻译和解释。
+
+### 4.7.1 Paxos
+
+Paxos是容忍分区的一致性算法，是非常重要的一致性算法之一，Google内部的系统中有很多是使用了Paxos一致性算法，如Chubby lock manager（BigTable、MegaStore中有使用）、Google File System、Spanner等。
+
+Paxos是会议希腊岛屿Paxos命名的，最早在Leslie Lamport的一篇1998年的论文"The Part-Time Parliament"中引用到。Paxos大家认为比较难以实现，也有很多公司的研究人员进一步阐述了一些细节、实践，详见参考文献。你可以看到Lamport的一些评论，如[here](http://lamport.azurewebsites.net/pubs/pubs.html#lamport-paxos) and [there](http://lamport.azurewebsites.net/pubs/pubs.html#paxos-simple)。
+
+Paxos的一个问题是它的论文里面只详细解释了决策一个value的详细过程，但是实际系统中经常需要对多个value进行决策，因此也有很多人在原论文基础上进行补充，补充关于如何实现Multi-Paxos。除了这些之外，也需要考虑集群成员变更的问题需要考虑。
+
+### 4.7.2 ZAB
+
+Zookeeper Atomic Broadcast协议，这个协议在？Apache Zookeeper中使用。ZK是一个提供分布式协调（coordination）能力的系统，ZK在有些以Hadoop为中心的分布式系统中使用，如HBase、Storm、Kafka。ZK可以说是Chubby的开源版本。从纯技术角度来说，ZAB并不只是共识问题，但是这里还是只讨论ZAB如何容忍分区、实现强一致性的问题。
+
+### 4.7.3 Raft
+
+Raft是2013年提出来的，是对一致性算法的有力补充。它的设计初衷是为了有助于理解，比如在教学中使用，或者在工程上更方便实现，同时也提供了一些容忍分区、实现强一致性的保证，当然在性能上也有一定的保证。特别是，算法中的不同核心部分分成了不同的部分进行描述，如leader选举、日志复制、安全性，以及包括对集群成员变更的描述。Raft现在已经被不少系统使用，如etcd中。
 
 ## 4.8 遵循强一致的复制方法
 
-- 主备复制
-- 两阶段提交
-- Paxos
+现在介绍一些满足强一致性的复制方法，首先从同步复制、异步复制这两个相对的复制方法开始，然后我们继续看能够容忍更加复杂故障的算法，这里简单总结了下这些复制算法的关键点。
+
+### 4.8.1 主备复制
+
+主备复制（Primary/Backup）的特点：
+
+- Single, static master
+- Replicated log, slaves are not involved in executing operations
+- No bounds on replication delay
+- Not partition tolerant
+- Manual/ad-hoc failover, not fault tolerant, "hot backup"
+
+参考资料：
+
+- [Replication techniques for availability](http://scholar.google.com/scholar?q=Replication+techniques+for+availability) - Robbert van Renesse & Rachid Guerraoui, 2010
+- [Concurrency Control and Recovery in Database Systems](http://research.microsoft.com/en-us/people/philbe/ccontrol.aspx)
+
+### 4.8.2 两阶段提交
+
+两阶段提交（2PC）的特点：
+
+- Unanimous vote: commit or abort
+- Static master
+- 2PC cannot survive simultaneous failure of the coordinator and a node during a commit
+- Not partition tolerant, tail latency sensitive
+
+参考资料：
+
+- [Replication techniques for availability](http://scholar.google.com/scholar?q=Replication+techniques+for+availability) - Robbert van Renesse & Rachid Guerraoui, 2010
+- [Concurrency Control and Recovery in Database Systems](http://research.microsoft.com/en-us/people/philbe/ccontrol.aspx)
+
+### 4.8.3 Paxos
+
+Paxos的特点：
+
+- Majority vote
+- Dynamic master
+- Robust to n/2-1 simultaneous failures as part of protocol
+- Less sensitive to tail latency
+
+参考资料：
+
+- [The Part-Time Parliament](http://research.microsoft.com/users/lamport/pubs/lamport-paxos.pdf) - Leslie Lamport
+- [Paxos Made Simple](http://research.microsoft.com/users/lamport/pubs/paxos-simple.pdf) - Leslie Lamport, 2001
+- [Paxos Made Live](http://research.google.com/archive/paxos_made_live.html) - An Engineering Perspective - Chandra et al
+- [Paxos Made Practical](http://scholar.google.com/scholar?q=Paxos+Made+Practical) - Mazieres, 2007
+- [Revisiting the Paxos Algorithm](http://groups.csail.mit.edu/tds/paxos.html) - Lynch et al
+- [How to build a highly available system with consensus](http://research.microsoft.com/lampson/58-Consensus/Acrobat.pdf) - Butler Lampson
+- [Reconfiguring a State Machine](http://research.microsoft.com/en-us/um/people/lamport/pubs/reconfiguration-tutorial.pdf) - Lamport et al - changing cluster membership
+- [Implementing Fault-Tolerant Services Using the State Machine Approach: a Tutorial](http://citeseer.ist.psu.edu/viewdoc/summary?doi=10.1.1.20.4762) - Fred Schneider
+
+### 4.8.4 Raft & ZAB
+
+Raft和ZAB的关键特点这里先忽略了，感兴趣的可以阅读相关论文。
+
+- [In Search of an Understandable Consensus Algorithm](https://ramcloud.stanford.edu/wiki/download/attachments/11370504/raft.pdf), Diego Ongaro, John Ousterhout, 2013
+- [Raft Lecture](http://www.youtube.com/watch?v=YbZ3zDzDnrw) - User Study
+- [A simple totally ordered broadcast protocol](http://labs.yahoo.com/publication/a-simple-totally-ordered-broadcast-protocol/) - Junqueira, Reed, 2008
+- [ZooKeeper Atomic Broadcast](http://labs.yahoo.com/publication/zab-high-performance-broadcast-for-primary-backup-systems/) - Reed, 2011
 
 # 5 [Replication: accepting divergence](http://book.mixu.net/distsys/eventual.html)
 
