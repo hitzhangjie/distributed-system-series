@@ -1488,6 +1488,62 @@ B: max(max(max(0, 5), 7), 3) = 7
 
 ## 5.11 CRDTs：可收敛的复制数据类型（Convergent repliated data types）
 
+CRDT（收敛的复制数据类型）利用有关特定数据类型上特定操作的可交换性和关联性的知识。
+
+在副本偶尔进行通信的环境下，为了使一组操作能收敛于相同的值，这些操作需要与顺序无关并且对（消息）复制/传递不敏感。因此，其操作需要满足：
+
+- 遵循结合律（a +（b + c）=（a + b）+ c），因此分组无关紧要
+- 遵循交换律（a + b = b + a），因此应用顺序无关紧要
+- 是幂等的（a + a = a），因此重复操作无关紧要
+
+事实证明，这些数据结构在数学上已经为人所知。它们被称为join操作或meet semilattices。
+
+lattice(格)是部分有序的集合，具有不同的顶部（最小上限）和不同的底部（最大下限）。半晶格(semilattices)就像一个晶格，但是只有一个不同的顶部或底部。联接半格(join semilattices)是具有不同的顶部（最小上限）的一个相交半格(meet semilattices)是一个具有不同的底部（最大下界限）的半格。
+
+可以将表示为半格的任何数据类型实现为保证收敛的数据结构。例如，计算值集的max()总是返回相同的结果，而不管接收值的顺序如何，只要最终接收所有值即可，因为max()操作是关联的，可交换的和幂等。
+
+例如，以下是两个网格：一个是为集合绘制的，其中合并运算符为union(items)，另一个是为严格增加的整数计数器绘制的，其中合并运算符为max(values)：
+
+```bash
+   { a, b, c }              7
+  /      |    \            /  \
+{a, b} {b,c} {a,c}        5    7
+  |  \  /  | /           /   |  \
+  {a} {b} {c}            3   5   7
+```
+
+使用可以表示为半格的数据类型，您可以使副本以任何模式进行通信并以任何顺序接收更新，并且只要它们都看到相同的信息，它们最终将在最终结果上达成共识。 只要前提条件成立，这就是可以保证的强大功能。
+
+但是，将数据类型表示为半格通常需要某种程度的解释。 许多数据类型的操作实际上与顺序无关。 例如，将项目添加到集合中是关联的，可交换的和幂等的。 但是，如果我们还允许从集合中删除项目，那么我们需要某种方式来解决冲突的操作，例如add（A）和remove（A）。 如果本地副本从不添加元素，则删除元素是什么意思？ 必须以与顺序无关的方式指定此分辨率，并且存在几种具有不同权衡取舍的不同选择。
+
+这意味着几种熟悉的数据类型具有更专业的实现，如CRDT，它们进行了不同的折衷，以便以与顺序无关的方式解决冲突。 与仅处理寄存器的键值存储（例如从系统角度来看是不透明的blob的值）不同，使用CRDT的人必须使用正确的数据类型以避免异常。
+
+指定为CRDT的不同数据类型的一些示例包括：
+
+- Counters
+Grow-only counter (merge = max(values); payload = single integer)
+Positive-negative counter (consists of two grow counters, one for increments and another for decrements)
+
+- Registers
+Last Write Wins -register (timestamps or version numbers; merge = max(ts); payload = blob)
+Multi-valued -register (vector clocks; merge = take both)
+
+- Sets
+	- Grow-only set (merge = union(items); payload = set; no removal)
+	- Two-phase set (consists of two sets, one for adding, and another for removing; elements can be added once and removed once)
+	- Unique set (an optimized version of the two-phase set)
+	- Last write wins set (merge = max(ts); payload = set)
+	- Positive-negative set (consists of one PN-counter per set item)
+	- Observed-remove set
+
+- Graphs and text sequences (see the paper)
+
+为了确保无异常运行，您需要为特定的应用程序找到正确的数据类型-例如，如果您知道只删除一次项目，则分两阶段工作； 如果仅将项目添加到集合中而从不删除它们，则仅增长集合起作用。
+
+并非所有数据结构都具有称为CRDT的实现，但是在[Shapiro等人的最新调查报告](http://hal.inria.fr/docs/00/55/55/88/PDF/techreport.pdf)（2011年）中，有针对布尔，计数器，集合，寄存器和图形的CRDT实现。
+
+有趣的是，寄存器实现与键值存储使用的实现直接相对应：last-write-wins寄存器使用时间戳或某些等效时间戳，并简单地收敛到最大时间戳值； 多值寄存器对应于Dynamo保留，公开和协调并发更改的策略。 有关详细信息，建议您阅读本章进一步阅读部分中的文章。
+
 ## 5.12 CALM定理
 
 ## 5.13 什么是非单调性（non-mononicity）
