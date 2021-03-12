@@ -1387,6 +1387,23 @@ Dynamo的设计是保证总是可写的，它引入了一种机制来处理节�
 
 ## 5.8 副本同步：gossip协议 与 Merkle树
 
+假定Dynamo系统能够容忍节点故障和网络分区的情况，它需要一种处理机制，来应对节点故障或分区恢复后又重新加入集群的情况。
+
+副本同步，用于使故障、分区又恢复的节点保持数据更新到最新，以及在副本间周期性地同步数据。
+
+Gossip是一种实现副本同步的（基于概率的）技术，这里的通信模式（比如一个节点将联系哪几个节点）没有提前确定。而是，节点有概率p来尝试和其他每个节点进行同步操作。每隔t秒，每个节点会选择一个节点来进行通信。这提供了一种除了同步任务（如部分仲裁写）之外的机制来讲部分更新到最新。
+
+Gossip这种通信方式是可扩展的，也没有单点故障的风险，但是只能够提供基于概率的保证，不能做到100%的保证。
+
+为了让副本同步过程中的信息交换更加高效，Dynamo使用了Merkle树（本文不会介绍）。主要思想就是，将数据存储hash到不同粒度级别，如hash到完整的内容，hash到一半的keys，hash到1/4的keys，等等。
+
+关于Merkle树的介绍可以参考，Merkle树在数据验证、一致性检测、数据同步方面都有使用，可以参考下列文章、视频学习：
+- [How Merkle Trees Enable the Decentralized Web](https://youtu.be/YIc6MNfv5iQ)
+- [Understanding Merkle Trees - Why use them, who uses them, and how to use them](https://www.codeproject.com/Articles/1176140/Understanding-Merkle-Trees-Why-use-them-who-uses-t)
+- [Merkle Tree Construction and Proof-of-Inclusion](https://www.derpturkey.com/merkle-tree-construction-and-proof-of-inclusion/)
+
+通过维护一个更细粒度的hash，节点可以更加高效的比较它们的数据，比传统方式更快。一旦节点识别出哪些keys有不同的数据，它们就可以交换必要的信息来更新副本。
+
 ## 5.9 Dynamo实践：PBS（probabilistically bounded staleness）
 
 ## 5.10 无序编程
