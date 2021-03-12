@@ -1681,4 +1681,61 @@ or P(false)
 - [Eventual Consistency Today: Limitations, Extensions, and Beyond](https://queue.acm.org/detail.cfm?id=2462076) - Bailis & Ghodsi, 2013
 - [Optimistic replication](http://www.ysaito.com/survey.pdf) - Saito & Shapiro, 2005
 
-# 6 [Appendix](http://book.mixu.net/distsys/appendix.html)
+# 6 [阅读更多及附录](http://book.mixu.net/distsys/appendix.html)
+
+如果您已经做到了这一点，谢谢。
+
+如果您喜欢这本书，请在Github（或Twitter）上关注我。 我喜欢看到自己产生了一些积极的影响。 “创造比获得的价值还多的价值”以及所有这些。
+
+如果本书有第6章，则可能是关于如何利用和处理大量数据的方法。 似乎最常见的“大数据”计算类型是通过单个简单程序传递大数据集的类型。 我不确定后续的章节将是什么（鉴于当前的重点放在可行性上，也许是高性能计算），但我可能会在几年后知道。
+
+## 分布式系统相关书籍
+
+- Distributed Algorithms (Lynch)
+
+这可能是有关分布式算法的最常推荐的书。 我也会推荐它，但有一个警告。 它非常全面，但是是为研究生读者而写的，因此在开始对从业者最感兴趣的事情之前，您将花费大量时间阅读有关同步系统和共享内存算法的信息。
+
+- Introduction to Reliable and Secure Distributed Programming (Cachin, Guerraoui & Rodrigues)
+
+对于从业者来说，这是一个有趣的过程。 它简短且充满了实际的算法实现。
+
+- Replication: Theory and Practice
+
+如果您对复制感兴趣，那么这本书真是太棒了。 关于复制的章节主要基于本书有趣部分的综合以及最近的阅读。
+
+- Distributed Systems: An Algorithmic Approach (Ghosh)
+- Introduction to Distributed Algorithms (Tel)
+- Transactional Information Systems: Theory, Algorithms, and the Practice of Concurrency Control and Recovery (Weikum & Vossen)
+
+这本书是关于传统交易信息系统的，例如 本地RDBMS。 最后有关于分布式事务的两章，但是本书的重点是事务处理。
+
+- Transaction Processing: Concepts and Techniques by Gray and Reuter
+
+经典。 我发现Weikum＆Vossen是最新的。
+
+## 会议论文
+
+每年，关于分布式计算原理的杰出论文都会获得[Edsger W. Dijkstra的分布式计算奖](http://en.wikipedia.org/wiki/Dijkstra_Prize)。 请查看完整列表的链接，其中包括诸如以下的经典名称：
+
+- "[Time, Clocks and Ordering of Events in a Distributed System](http://research.microsoft.com/users/lamport/pubs/time-clocks.pdf)" - Leslie Lamport
+- "[Impossibility of Distributed Consensus With One Faulty Process](http://theory.lcs.mit.edu/tds/papers/Lynch/jacm85.pdf)" - Fisher, Lynch, Patterson
+- "[Unreliable failure detectors and reliable distributed systems](http://scholar.google.com/scholar?q=Unreliable+Failure+Detectors+for+Reliable+Distributed+Systems)" - Chandra and Toueg
+
+Microsoft学术搜索列出了按引用次数排序的[分布式和并行计算领域的顶级出版物](http://libra.msra.cn/RankList?entitytype=1&topDomainID=2&subDomainID=16&last=0&start=1&end=100)，这可能是一个有趣的列表，可浏览更多经典著作。
+
+以下是一些推荐论文的附加列表：
+
+- [Nancy Lynch's recommended reading list](http://courses.csail.mit.edu/6.852/08/handouts/handout3.pdf) from her course on Distributed systems.
+- [NoSQL Summer paper list](http://nosqlsummer.org/papers) - a curated list of papers related to this buzzword.
+- [A Quora question on seminal papers in distributed systems](http://www.quora.com/What-are-the-seminal-papers-in-distributed-systems-Why).
+
+## 业界分布式系统
+
+- [The Google File System](http://research.google.com/archive/gfs.html) - Ghemawat, Gobioff and Leung
+- [MapReduce: Simplified Data Processing on Large Clusters](http://research.google.com/archive/mapreduce.html) - Dean and Ghemawat
+- [Dynamo: Amazon’s Highly Available Key-value Store](http://scholar.google.com/scholar?q=Dynamo%3A+Amazon%27s+Highly+Available+Key-value+Store) - DeCandia et al.
+- [Bigtable: A Distributed Storage System for Structured Data](http://research.google.com/archive/bigtable.html) - Chang et al.
+- [The Chubby Lock Service for Loosely-Coupled Distributed Systems](http://research.google.com/archive/chubby.html) - Burrows
+- [ZooKeeper: Wait-free coordination for Internet-scale systems](http://labs.yahoo.com/publication/zookeeper-wait-free-coordination-for-internet-scale-systems/) - Hunt, Konar, Junqueira, Reed, 2010
+
+
