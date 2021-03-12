@@ -1429,6 +1429,63 @@ PBS，通过信息的anti-entropy (gossip) rate、网络延时和节点本地处
 
 ## 5.10 无序编程
 
+回头来看下我们要解决的那些问题的例子。第一个场景是有三个服务器，出现了分区；当分区问题恢复之后，我们希望这些服务器能在结果上达成一致的值。Amazon的Dynamo通过在读取时遵循约束读取R-of-N个节点，并通过读取协调解决冲突的机制来使得这个“达成一致”变得可能。
+
+第二个场景是，我们考虑一个更加特定的操作：字符串连接操作。假如没有指定操作顺序的话（如没有协调机制），那就没有办法让多个服务器按照相同的操作顺序对字符串进行连接。但是，有些操作可以任何顺序安全地应用，而简单的寄存器将无法执行这些操作。 正如Pat Helland写道：
+
+> ... operation-centric work can be made commutative (with the right operations
+> and the right semantics) where a simple READ/WRITE semantic does not lend 
+> itself to commutativity.
+
+...以操作为中心的工作可以进行交换（具有正确的操作和正确的语义），而简单的READ / WRITE语义不会使其具有交换性。
+
+例如，考虑一个实现了简单审计功能的系统，它以两种不同的方式实现了debit、credit操作：
+
+- 使用一个register来实现read、write操作；
+- 使用一个integer数据类型来实现debit、credit操作；
+
+后一种实现更了解数据类型的内部细节，所以不管这个操作如何排序，它也能够保持这个操作的意图不变。debiting和crediting可以以任意顺序操作，最终结果将是一致的：
+
+```bash
+100 + credit(10) + credit(20) = 130 and
+100 + credit(20) + credit(10) = 130
+```
+
+然而，将同一个值进行更新，就更顺序有关系。如果写操作被重排序了，那么后面的写操作将覆盖前面的写操作写入的值：
+
+```bash
+100 + write(110) + write(130) = 130 but
+100 + write(130) + write(110) = 110
+```
+
+我们再看下本章节开始时的实例，但是这里使用一个不同的操作。这个场景中，clients发送消息给两个节点，发送消息的顺序是不同的（至少在server接收来看是这样的）：
+
+```bash
+[Clients]  --> [A]  1, 2, 3
+[Clients]  --> [B]  2, 3, 1
+```
+
+这里不是字符串连接，我们假定来寻找收到的消息里面的最大整数值，那么不管是上述哪个顺序，最终结果都是一致的：
+
+```bash
+1: { operation: max(previous, 3) }
+2: { operation: max(previous, 5) }
+3: { operation: max(previous, 7) }
+```
+
+即便是对发送消息进行协调，最终结果也都是样的，都为7：
+
+```go
+A: max(max(max(0, 3), 5), 7) = 7
+B: max(max(max(0, 5), 7), 3) = 7
+```
+
+这两种情况下，副本看到的数据更新次序是不一样的，但是我们能够以某种方式将更新结果合并起来，并且合并能得到相同的结果而不用管实际的更新顺序是怎样的。
+
+我们几乎不可能写出一个通用的merge方法来适配所有的数据类型。在Dynamo中，一个value是一个binary blob，所以最好的方式就是暴露出来给应用程序去处理、解决冲突。
+
+但是，如果我们知道数据具体是什么类型的，解决这里的冲突也会变得可能。CRDT's是一些数据结构，只要能够看到相同的操作的集合（不用管顺序怎样），就能收敛到相同的结果。
+
 ## 5.11 CRDTs：可收敛的复制数据类型（Convergent repliated data types）
 
 ## 5.12 CALM定理
